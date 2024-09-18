@@ -1,0 +1,115 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        border-radius: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .img-fluid {
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .badge {
+        font-size: 1em;
+    }
+    
+    .alert {
+        border-radius: 10px;
+    }
+    
+    .table {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        h3 {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h1 class="card-title mb-4">Product Details</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Sử dụng product_image nếu có, không thì hiển thị ảnh mặc định từ URL -->
+                    <img src="{{ product.product_image.url|default:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWgefHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' }}" alt="Product Image" class="img-fluid rounded mb-3">
+                </div>
+                <div class="col-md-6">
+                    <h2 class="mb-3">{{ product.product }}</h2>
+                    <p><strong>Company:</strong> {{ product.company }}</p>
+                    <p><strong>Ingredient:</strong> {{ product.ingredient.ingredient }}</p>
+                    <p><strong>HSN Code:</strong> {{ product.hsn_code.hsn_code }}</p>
+                    <p><strong>Availability:</strong> <span class="badge bg-success">In Stock</span></p>
+                </div>
+            </div>
+            <hr>
+            <h3 class="mb-3">Ingredient Details</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Name:</strong> {{ product.ingredient.ingredient }}</p>
+                    <p><strong>Concentration:</strong> {{ product.ingredient.detail }}</p>
+                    <p><strong>Chemical Class:</strong> Organophosphate</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">Safety Precautions</h4>
+                        <ul>
+                            <li>Wear protective clothing and gloves when handling</li>
+                            <li>Avoid contact with skin and eyes</li>
+                            <li>Do not inhale spray mist</li>
+                            <li>Wash hands thoroughly after use</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <h3 class="mb-3">Batch Information</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Batch Number</th>
+                            <th>Manufacturing Date</th>
+                            <th>Expiration Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for batch in product.productbatch_set.all %}
+                        <tr>
+                            <td>{{ batch.batch_no }}</td>
+                            <td>{{ batch.mfgdate|date:"Y-m-d" }}</td>
+                            <td>{{ batch.expirydate|date:"Y-m-d" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3">No batch information available at the moment.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

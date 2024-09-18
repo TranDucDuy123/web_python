@@ -1,0 +1,111 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Scan QR Code{% endblock title %}
+
+{% block content %}
+<div class="video-container">
+  <h2 class="video-title">Scan QR Code</h2>
+  <video id="qr-video" autoplay playsinline></video>
+  <p>Or upload an image:</p>
+  <input type="file" id="qr-image-input" accept="image/*">
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" integrity="sha512-r6rDA7W6ZeQhvl8S7yRVQUKVHdexq+GAlNkNNqVC7YyIV+NwqCTJe2hDWCiffTyRNOeGEzRRJ9ifvRm/HCzGYg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+  const video = document.getElementById('qr-video');
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  let scanning = false;
+
+  function startScanning() {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(stream => {
+        video.srcObject = stream;
+        video.play();
+        requestAnimationFrame(scanQRCode);
+      })
+      .catch(err => {
+        console.error("Error accessing the camera: ", err);
+      });
+  }
+
+  function scanQRCode() {
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: "dontInvert",
+      });
+
+      if (code) {
+        if (!scanning) {
+          scanning = true;
+          console.log(`QR Code scanned: ${code.data}`);
+          if (code.data.startsWith('http')) {
+            window.location.href = code.data;
+          } else {
+            alert(`Found QR code: ${code.data}`);
+          }
+          stopScanning();
+        }
+      } else {
+        requestAnimationFrame(scanQRCode);
+      }
+    } else {
+      requestAnimationFrame(scanQRCode);
+    }
+  }
+
+  function stopScanning() {
+    if (video.srcObject) {
+      const stream = video.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      video.srcObject = null;
+    }
+  }
+
+  // Bắt đầu quét khi trang được tải
+  window.onload = function() {
+    startScanning();
+  };
+
+  // Quét mã QR từ ảnh được tải lên
+  document.getElementById('qr-image-input').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgElement = document.createElement('img');
+        imgElement.src = e.target.result;
+
+        imgElement.onload = function() {
+          canvas.width = imgElement.width;
+          canvas.height = imgElement.height;
+          context.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          });
+
+          if (code) {
+            console.log(`Found QR code`, code.data);
+            if (code.data.startsWith('http')) {
+              window.location.href = code.data;
+            } else {
+              alert(`Found QR code: ${code.data}`);
+            }
+          } else {
+            alert("No QR code found in the image.");
+          }
+        }
+      }
+      reader.readAsDataURL(file); // Đọc ảnh từ file
+    }
+  });
+</script>
+
+{% endblock content %}

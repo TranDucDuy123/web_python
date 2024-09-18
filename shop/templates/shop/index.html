@@ -1,0 +1,60 @@
+{% load static %}
+
+<h2>Products</h2>
+
+{% if products_list %}
+    <ul>
+    {% for product in products_list %}
+        <li><b>Product</b>: {{ product.batch_no.product.product }}, <b>BatchNo</b>: {{ product.batch_no.batch_no }}, <b>Packing</b>: {{ product.packing }}, <b>Price</b>: {{product.price}}, <b>Expiry Date</b>: {{ product.batch_no.expirydate }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No products are available.</p>
+{% endif %}
+<hr>
+
+<h2>Customers</h2>
+
+{% if customers_list %}
+    <ul>
+    {% for customer in customers_list %}
+        <li><b>Name</b>: {{ customer.name }}, <b>Address</b>: {{ customer.address }}, <b>Mobile No.</b>: {{ customer.mobile_no }}, <b>Joining Date</b>: {{customer.joining_date}}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Customers are available.</p>
+{% endif %}
+<hr>
+
+
+<h2>Bills</h2>
+
+{% if bills_list %}
+    <ul>
+    {% for bill in bills_list %}
+        <li><b>Purchase No.</b>: {{ bill.purchaseno }}, <b>Customer Name</b>: {{ bill.customer.name }}
+        <b>Purchase Date</b>: {{ bill.purchase_date }}
+        <a href="{% url 'shop:edit' bill.purchaseno  bill.customer_id %}" >Edit</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Bills are available.</p>
+{% endif %}
+<hr>
+
+<h2>Bill Items</h2>
+
+{% if bill_items %}
+    <ul>
+    {% for item in bill_items %}
+        <li><b>Purchase Date</b>: {{ item.purchaseno.purchase_date }},<b>Customer Name</b>: {{ item.purchaseno.customer.name }}, <b>Purchase No.</b>: {{ item.purchaseno.purchaseno }}, <b>Product Name</b>: {{ item.productName }}
+        <b>Product Packing</b>: {{ item.productPacking }},<b>Product Price</b>: {{ item.productPrice }}, ,<b>Product Quantity</b>: {{ item.productQuantity }}
+        <b>Product Batch</b>: {{ item.productBatch }},<b>Product Total Price</b>: {{ item.productTotalPrice }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Bill Items are available.</p>
+{% endif %}
+<hr>

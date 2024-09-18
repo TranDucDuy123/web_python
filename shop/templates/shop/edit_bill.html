@@ -1,0 +1,174 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous"> -->
+    <style type="text/css">
+        .spacer{
+            margin-top:25px;
+        }
+    </style>
+    <title>Shop - Bill</title>
+</head>
+<h1 class="text-accent-dark" style="margin-top: 0px; color: #a3033b">Edit <strong class="text-accent-dark" style="color: #1ab394">Data</strong></h1>
+												
+
+<form class="form-horizontal" method="POST">
+    {% csrf_token %}
+
+
+<div class="row spacer">
+    <div class="col-2">
+        <label>{{form.customer.label}}</label>
+    </div>
+    <div class="col-4">
+        <div class="input-group">
+            {{form.customer}}
+        </div>
+    </div>
+</div>
+
+
+<div class="row spacer">
+    <div class="col-2">
+        <label>{{form.purchase_date.label}}</label>
+    </div>
+    <div class="col-4">
+        <div class="input-group">
+            {{form.purchase_date}}
+        </div>
+    </div>
+</div>
+
+{{ formset.management_form }}
+{% for form in formset %}
+<div class="formsetdata">
+
+<div class="row form-row spacer">
+    
+    <div class="col-4">
+        <div class="input-group">
+            {{form.id}}
+        </div>
+    </div>
+</div>   
+
+<div class="row form-row spacer">
+    <div class="col-2">
+        <label>{{form.productName.label}}</label>
+    </div>
+    <div class="col-4">
+        <div class="input-group">
+            {{form.productName}}
+        </div>
+    </div>
+</div>
+
+<div class="row form-row spacer">
+    <div class="col-2">
+        <label>{{form.productQuantity.label}}</label>
+    </div>
+    <div class="col-4">
+        <div class="input-group">
+            {{form.productQuantity}}
+        </div>
+    </div>
+</div>
+
+</div>
+{% endfor %}  
+<div class="input-group-append">
+    
+    <button class="btn btn-success add-form-row">+</button> 
+    
+</div>  
+
+<div class="row spacer">
+    <div class="col-4 offset-2">
+        <button type="submit" class="btn btn-block btn-primary">Update</button>
+    </div>
+</div>
+</form>
+
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script> -->
+    
+{% block custom_js %}
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script type="text/javascript">
+function updateElementIndex(el, prefix, ndx) {
+    var id_regex = new RegExp('(' + prefix + '-\\d+)');
+    var replacement = prefix + '-' + ndx;
+    if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+    if (el.id) el.id = el.id.replace(id_regex, replacement);
+    if (el.name) el.name = el.name.replace(id_regex, replacement);
+}
+function cloneMore(selector, prefix) {
+    var newElement = $(selector).clone(true);
+    var total = $('#id_' + prefix + '-TOTAL_FORMS').val();
+    newElement.find(':input:not([type=button]):not([type=submit]):not([type=reset])').each(function() {
+        var name = $(this).attr('name')
+        if(name) {
+            name = name.replace('-' + (total-1) + '-', '-' + total + '-');
+            var id = 'id_' + name;
+            $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+        }
+    });
+    newElement.find('label').each(function() {
+        var forValue = $(this).attr('for');
+        if (forValue) {
+          forValue = forValue.replace('-' + (total-1) + '-', '-' + total + '-');
+          $(this).attr({'for': forValue});
+        }
+    });
+    total++;
+    $('#id_' + prefix + '-TOTAL_FORMS').val(total);
+    $(selector).after(newElement);
+    var conditionRow = $('.formsetdata:not(:last)');
+    conditionRow.find('.btn.add-form-row')
+    .removeClass('btn-success').addClass('btn-danger')
+    .removeClass('add-form-row').addClass('remove-form-row')
+    .html('-');
+    return false;
+}
+function deleteForm(prefix, btn) {
+    var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+    if (total > 1){
+        btn.closest('.formsetdata').remove();
+        var forms = $('.formsetdata');
+        $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);
+        for (var i=0, formCount=forms.length; i<formCount; i++) {
+            $(forms.get(i)).find(':input').each(function() {
+                updateElementIndex(this, prefix, i);
+            });
+        }
+    }
+    return false;
+}
+$(document).on('click', '.add-form-row', function(e){
+    e.preventDefault();
+    cloneMore('.formsetdata:last', 'form');
+    return false;
+});
+$(document).on('click', '.remove-form-row', function(e){
+    e.preventDefault();
+    deleteForm('form', $(this));
+    return false;
+});
+
+</script>
+{% endblock %}
+
+{% endblock content %}
