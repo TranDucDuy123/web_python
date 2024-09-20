@@ -3,6 +3,17 @@
 {% block title %}Dashboard{% endblock title %}
 
 {% block content %}
+<style>
+    .qr-code {
+        max-width: 150px;
+        width: 150px !important;
+        height: 150px !important;
+    }
+    .table-stats table th img, .table-stats table td img {
+        margin-right: 10px;
+        max-width: 145px;
+    }
+</style>
 <div class="orders">
     <div class="row">
         <div class="col-xl-12">
@@ -38,7 +49,7 @@
                                     <td>
                                         {% if product.qr_code %}
                                              {% comment %} <h4>{{ product.qr_code.url }}<h4/> {% endcomment %}
-                                            <img src="{{ product.qr_code.url }}" alt="QR Code for {{ product.product }}" width="50">
+                                            <img class="qr-code" src="{{ product.qr_code.url }}" alt="QR Code for {{ product.product }}" width="100">
                                         {% else %}
                                             No QR Code
                                         {% endif %}
@@ -46,7 +57,7 @@
                                     <td>
                                         {% if product.qr_code2 %}
                                              {% comment %} <h4>{{ product.qr_code.url }}<h4/> {% endcomment %}
-                                            <img src="{{ product.qr_code2.url }}" alt="QR Code for {{ product.product }}" width="50">
+                                            <img class="qr-code" src="{{ product.qr_code2.url }}" alt="QR Code for {{ product.product }}" width="100">
                                         {% else %}
                                             No QR Code
                                         {% endif %}
