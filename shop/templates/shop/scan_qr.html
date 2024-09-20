@@ -9,6 +9,7 @@
   <p>Or upload an image:</p>
   <input type="file" id="qr-image-input" accept="image/*">
 </div>
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" integrity="sha512-r6rDA7W6ZeQhvl8S7yRVQUKVHdexq+GAlNkNNqVC7YyIV+NwqCTJe2hDWCiffTyRNOeGEzRRJ9ifvRm/HCzGYg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -19,16 +20,21 @@
   let scanning = false;
 
   function startScanning() {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-      .then(stream => {
-        video.srcObject = stream;
-        video.play();
-        requestAnimationFrame(scanQRCode);
-      })
-      .catch(err => {
-        console.error("Error accessing the camera: ", err);
-      });
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(stream => {
+          video.srcObject = stream;
+          video.play();
+          requestAnimationFrame(scanQRCode);
+        })
+        .catch(err => {
+          console.error("Error accessing the camera: ", err);
+        });
+    } else {
+      console.error("getUserMedia is not supported in this browser.");
+    }
   }
+  
 
   function scanQRCode() {
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
